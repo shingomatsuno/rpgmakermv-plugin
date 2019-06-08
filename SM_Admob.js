@@ -103,8 +103,8 @@ var reworded = false;
     var paramAndroidRewordId        = String(PluginManager.parameters(pluginName)['Androidのリワード広告ID']);
     var paramRewordCommonEventId    = Number(PluginManager.parameters(pluginName)['動画リワード後のコモンイベントID']);
     var paramRewordMissCommonEventId  = Number(PluginManager.parameters(pluginName)['動画リワード読み込み失敗時のコモンイベントID']);
-    var paramBannerTopFlag          = Boolean(PluginManager.parameters(pluginName)['バナー広告の位置']);
-    var paramTestFlag               = Boolean(PluginManager.parameters(pluginName)['テストモード']);
+    var paramBannerTopFlag          = String(PluginManager.parameters(pluginName)['バナー広告の位置']) == 'true';
+    var paramTestFlag               = String(PluginManager.parameters(pluginName)['テストモード']) == 'true';
 
     // 広告ID
     var ua = navigator.userAgent;
@@ -120,7 +120,7 @@ var reworded = false;
         isMobile = true;
     } 
 
-    if(paramTestFlag){
+    if(paramTestFlag === true){
         // テスト広告
         if(bannerId){
             bannerId = 'ca-app-pub-3940256099942544/6300978111';
