@@ -82,9 +82,9 @@ var isLoadInterstitial = false;
 var isLoadReword = false;
 var reworded = false;
 
-(function() {
+(function () {
     'use strict';
-    
+
     var pluginName = 'SM_Admob'
 
     var bannerId = "";
@@ -95,16 +95,16 @@ var reworded = false;
     //=============================================================================
     // パラメータの取得
     //=============================================================================
-    var paramIosBannerId            = String(PluginManager.parameters(pluginName)['IOSのバナー広告ID']);
-    var paramAndroidBannerId        = String(PluginManager.parameters(pluginName)['Androidのバナー広告ID']);
-    var paramIosInterstitialId      = String(PluginManager.parameters(pluginName)['IOSのインステ広告ID']);
-    var paramAndroidInterstitialId  = String(PluginManager.parameters(pluginName)['Androidのインステ広告ID']);
-    var paramIosRewordId            = String(PluginManager.parameters(pluginName)['IOSのリワード広告ID']);
-    var paramAndroidRewordId        = String(PluginManager.parameters(pluginName)['Androidのリワード広告ID']);
-    var paramRewordCommonEventId    = Number(PluginManager.parameters(pluginName)['動画リワード後のコモンイベントID']);
-    var paramRewordMissCommonEventId  = Number(PluginManager.parameters(pluginName)['動画リワード読み込み失敗時のコモンイベントID']);
-    var paramBannerTopFlag          = String(PluginManager.parameters(pluginName)['バナー広告の位置']) == 'true';
-    var paramTestFlag               = String(PluginManager.parameters(pluginName)['テストモード']) == 'true';
+    var paramIosBannerId = String(PluginManager.parameters(pluginName)['IOSのバナー広告ID']);
+    var paramAndroidBannerId = String(PluginManager.parameters(pluginName)['Androidのバナー広告ID']);
+    var paramIosInterstitialId = String(PluginManager.parameters(pluginName)['IOSのインステ広告ID']);
+    var paramAndroidInterstitialId = String(PluginManager.parameters(pluginName)['Androidのインステ広告ID']);
+    var paramIosRewordId = String(PluginManager.parameters(pluginName)['IOSのリワード広告ID']);
+    var paramAndroidRewordId = String(PluginManager.parameters(pluginName)['Androidのリワード広告ID']);
+    var paramRewordCommonEventId = Number(PluginManager.parameters(pluginName)['動画リワード後のコモンイベントID']);
+    var paramRewordMissCommonEventId = Number(PluginManager.parameters(pluginName)['動画リワード読み込み失敗時のコモンイベントID']);
+    var paramBannerTopFlag = String(PluginManager.parameters(pluginName)['バナー広告の位置']) == 'true';
+    var paramTestFlag = String(PluginManager.parameters(pluginName)['テストモード']) == 'true';
 
     // 広告ID
     var ua = navigator.userAgent;
@@ -113,39 +113,40 @@ var reworded = false;
         interstitialId = paramAndroidInterstitialId
         rewordId = paramAndroidRewordId;
         isMobile = true;
-    } else if (ua.match(/iPhone|iPad|iPod/)){
+    } else if (ua.match(/iPhone|iPad|iPod/)) {
         bannerId = paramIosBannerId;
         interstitialId = paramIosInterstitialId;
         rewordId = paramIosRewordId;
         isMobile = true;
-    } 
+    }
 
-    if(paramTestFlag === true){
+    if (paramTestFlag === true) {
         // テスト広告
-        if(bannerId){
+        if (bannerId) {
             bannerId = 'ca-app-pub-3940256099942544/6300978111';
         }
-        if(interstitialId){
+        if (interstitialId) {
             interstitialId = 'ca-app-pub-3940256099942544/8691691433';
         }
-        if(rewordId){
+        if (rewordId) {
             rewordId = 'ca-app-pub-3940256099942544/5224354917';
         }
     }
 
-    if(isMobile){
-        document.addEventListener('deviceready', function() {
-            if(bannerId){
+    if (isMobile) {
+        document.addEventListener('deviceready', function () {
+            if (bannerId) {
                 admob.banner.config({
                     id: bannerId,
                     bannerAtTop: paramBannerTopFlag,
                     isTesting: paramTestFlag,
                     autoShow: true,
                 });
-                admob.banner.prepare();
-                admob.banner.show();
+                admob.banner.prepare().then(() => {
+                    admob.banner.show();
+                });
             }
-            if(interstitialId){
+            if (interstitialId) {
                 admob.interstitial.config({
                     id: interstitialId,
                     isTesting: paramTestFlag,
@@ -153,7 +154,7 @@ var reworded = false;
                 })
                 admob.interstitial.prepare();
             }
-            if(rewordId){
+            if (rewordId) {
                 admob.rewardvideo.config({
                     id: rewordId,
                     isTesting: paramTestFlag,
@@ -162,47 +163,47 @@ var reworded = false;
                 admob.rewardvideo.prepare();
             }
         }, false);
-        if(bannerId){
-            document.addEventListener('admob.banner.events.LOAD_FAIL', function(event) {
+        if (bannerId) {
+            document.addEventListener('admob.banner.events.LOAD_FAIL', function (event) {
 
             });
         }
-        if(interstitialId){
-            document.addEventListener('admob.interstitial.events.LOAD', function(event) {
+        if (interstitialId) {
+            document.addEventListener('admob.interstitial.events.LOAD', function (event) {
                 isLoadInterstitial = true;
-            });        
-            document.addEventListener('admob.interstitial.events.LOAD_FAIL', function(event) {
+            });
+            document.addEventListener('admob.interstitial.events.LOAD_FAIL', function (event) {
                 isLoadInterstitial = false;
             });
-            document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
+            document.addEventListener('admob.interstitial.events.CLOSE', function (event) {
                 $gameSystem.replayBgm();
                 isLoadInterstitial = false;
                 admob.interstitial.prepare();
             });
         }
-        if(rewordId){
-            document.addEventListener('admob.rewardvideo.events.LOAD', function(event) {
+        if (rewordId) {
+            document.addEventListener('admob.rewardvideo.events.LOAD', function (event) {
                 isLoadReword = true;
             });
-            document.addEventListener('admob.rewardvideo.events.LOAD_FAIL', function(event) {
+            document.addEventListener('admob.rewardvideo.events.LOAD_FAIL', function (event) {
                 isLoadReword = false;
             });
-            document.addEventListener('admob.rewardvideo.events.REWARD', function(event) {
+            document.addEventListener('admob.rewardvideo.events.REWARD', function (event) {
                 //リワードの処理を実装する箇所
                 reworded = true;
             });
-            document.addEventListener('admob.rewardvideo.events.CLOSE', function(event) {
+            document.addEventListener('admob.rewardvideo.events.CLOSE', function (event) {
                 //広告を閉じた時に呼ばれる。
-                if(reworded){
+                if (reworded) {
                     $gameTemp.reserveCommonEvent(paramRewordCommonEventId);
                     reworded = false;
-                }else{
+                } else {
                     $gameTemp.reserveCommonEvent(paramRewordMissCommonEventId);
                 }
-               $gameSystem.replayBgm();
-               isLoadReword = false;
-               admob.rewardvideo.prepare();
-           });
+                $gameSystem.replayBgm();
+                isLoadReword = false;
+                admob.rewardvideo.prepare();
+            });
         }
     }
 
@@ -211,36 +212,36 @@ var reworded = false;
     //  プラグインコマンドを追加定義します。
     //=============================================================================
     var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-    Game_Interpreter.prototype.pluginCommand = function(command, args) {
+    Game_Interpreter.prototype.pluginCommand = function (command, args) {
         _Game_Interpreter_pluginCommand.call(this, command, args);
-      if (command === 'SM_インステ広告') {
-        if(isMobile){ 
-            if(isLoadInterstitial){
-                // mute
-                $gameSystem.saveBgm();
-                AudioManager.fadeOutBgm(1);
-                admob.interstitial.show();
-            }else{
-                admob.interstitial.prepare();
+        if (command === 'SM_インステ広告') {
+            if (isMobile) {
+                if (isLoadInterstitial) {
+                    // mute
+                    $gameSystem.saveBgm();
+                    AudioManager.fadeOutBgm(1);
+                    admob.interstitial.show();
+                } else {
+                    admob.interstitial.prepare();
+                }
             }
         }
-      }
-      if (command === 'SM_リワード広告') {
-        if(isMobile){
-            if(isLoadReword){
-                // mute
-                $gameSystem.saveBgm();
-                AudioManager.fadeOutBgm(1);
-                // 表示
-                admob.rewardvideo.show();                        
-            }else{
+        if (command === 'SM_リワード広告') {
+            if (isMobile) {
+                if (isLoadReword) {
+                    // mute
+                    $gameSystem.saveBgm();
+                    AudioManager.fadeOutBgm(1);
+                    // 表示
+                    admob.rewardvideo.show();
+                } else {
+                    $gameTemp.reserveCommonEvent(paramRewordMissCommonEventId);
+                    admob.rewardvideo.prepare();
+                }
+            } else {
                 $gameTemp.reserveCommonEvent(paramRewordMissCommonEventId);
-                admob.rewardvideo.prepare();
             }
-         } else {
-            $gameTemp.reserveCommonEvent(paramRewordMissCommonEventId);
-         }
-      }
+        }
     };
 })();
 
